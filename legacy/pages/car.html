@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>车辆信息 - 智慧社区监控大屏</title>
+    <link rel="stylesheet" href="../assets/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/common.css">
+    <script src="../assets/js/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(-45deg, #1a1a1a, #2d2d2d, #1a1a1a, #2d2d2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+
+
+        .nav-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            color: #1890ff;
+        }
+
+        .nav-item:hover {
+            background-color: #3d3d3d;
+        }
+
+        .nav-item.active {
+            background-color: #4a4a4a;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 200px;
+            padding: 20px;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .car-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .car-card {
+            background: rgba(45, 45, 45, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .car-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .car-chart {
+            height: 300px;
+            margin-top: 20px;
+        }
+
+        .car-list {
+            margin-top: 30px;
+        }
+
+        .car-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .car-table th,
+        .car-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .car-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: normal;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .tag-resident {
+            background-color: rgba(24, 144, 255, 0.2);
+            color: #1890ff;
+        }
+
+        .tag-visitor {
+            background-color: rgba(114, 46, 209, 0.2);
+            color: #722ed1;
+        }
+
+        .tag-temporary {
+            background-color: rgba(250, 173, 20, 0.2);
+            color: #faad14;
+        }
+
+        .parking-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-available {
+            background-color: #52c41a;
+        }
+
+        .status-occupied {
+            background-color: #ff4d4f;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="../assets/logo.svg" alt="智慧社区">
+            <h2>智慧社区</h2>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="../index.html"><i class="fas fa-chart-line"></i><span>社区概况</span></a></li>
+            <li class="nav-item"><a href="monitor.html"><i class="fas fa-video"></i><span>实时监控</span></a></li>
+            <li class="nav-item"><a href="device.html"><i class="fas fa-tools"></i><span>设备管理</span></a></li>
+            <li class="nav-item"><a href="alarm.html"><i class="fas fa-bell"></i><span>告警管理</span></a></li>
+            <li class="nav-item"><a href="people.html"><i class="fas fa-users"></i><span>人员信息</span></a></li>
+            <li class="nav-item"><a href="house.html"><i class="fas fa-home"></i><span>房屋信息</span></a></li>
+            <li class="nav-item active"><a href="car.html"><i class="fas fa-car"></i><span>车辆信息</span></a></li>
+            <li class="nav-item"><a href="patrol.html"><i class="fas fa-shield-alt"></i><span>巡更管理</span></a></li>
+            <li class="nav-item"><a href="repair.html"><i class="fas fa-wrench"></i><span>报修管理</span></a></li>
+            <li class="nav-item"><a href="notice.html"><i class="fas fa-bullhorn"></i><span>公告信息</span></a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>车辆信息</h1>
+        </div>
+
+        <div class="car-grid">
+            <div class="car-card">
+                <h3>车辆总览</h3>
+                <div class="car-info">
+                    <div>
+                        <h4>总车位数</h4>
+                        <p style="font-size: 24px;">500</p>
+                    </div>
+                    <div>
+                        <h4>已使用</h4>
+                        <p style="font-size: 24px; color: #ff4d4f;">386</p>
+                    </div>
+                    <div>
+                        <h4>剩余</h4>
+                        <p style="font-size: 24px; color: #52c41a;">114</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="car-card">
+                <h3>车位使用率</h3>
+                <div id="parkingUsageChart" class="car-chart"></div>
+            </div>
+
+            <div class="car-card">
+                <h3>车辆类型分布</h3>
+                <div id="carTypeChart" class="car-chart"></div>
+            </div>
+        </div>
+
+        <div class="car-list car-card">
+            <h3>车辆出入记录</h3>
+            <table class="car-table">
+                <thead>
+                    <tr>
+                        <th>车牌号</th>
+                        <th>车辆类型</th>
+                        <th>出入类型</th>
+                        <th>时间</th>
+                        <th>停车位</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>京A12345</td>
+                        <td><span class="tag tag-resident">业主</span></td>
+                        <td>进入</td>
+                        <td>2024-01-20 10:30</td>
+                        <td>A区-123</td>
+                        <td>
+                            <div class="parking-status">
+                                <div class="status-dot status-occupied"></div>
+                                <span>已停车</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>京B67890</td>
+                        <td><span class="tag tag-visitor">访客</span></td>
+                        <td>离开</td>
+                        <td>2024-01-20 10:15</td>
+                        <td>B区-045</td>
+                        <td>
+                            <div class="parking-status">
+                                <div class="status-dot status-available"></div>
+                                <span>已离开</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>京C13579</td>
+                        <td><span class="tag tag-temporary">临时</span></td>
+                        <td>进入</td>
+                        <td>2024-01-20 09:45</td>
+                        <td>C区-078</td>
+                        <td>
+                            <div class="parking-status">
+                                <div class="status-dot status-occupied"></div>
+                                <span>已停车</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 车位使用率图表
+        const parkingUsageChart = echarts.init(document.getElementById('parkingUsageChart'));
+        parkingUsageChart.setOption({
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['使用率'],
+                textStyle: {
+                    color: '#fff'
+                }
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                data: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
+                axisLine: {
+                    lineStyle: {
+                        color: '#fff'
+                    }
+                }
+            },
+            yAxis: {
+                type: 'value',
+                axisLine: {
+                    lineStyle: {
+                        color: '#fff'
+                    }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            },
+            series: [{
+                name: '使用率',
+                type: 'line',
+                smooth: true,
+                data: [30, 25, 65, 85, 70, 95, 55],
+                itemStyle: {
+                    color: '#1890ff'
+                },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0,
+                        color: 'rgba(24, 144, 255, 0.3)'
+                    }, {
+                        offset: 1,
+                        color: 'rgba(24, 144, 255, 0)'
+                    }])
+                }
+            }]
+        });
+
+        // 车辆类型分布图表
+        const carTypeChart = echarts.init(document.getElementById('carTypeChart'));
+        carTypeChart.setOption({
+            tooltip: {
+                trigger: 'item'
+            },
+            legend: {
+                top: '5%',
+                left: 'center',
+                textStyle: {
+                    color: '#fff'
+                }
+            },
+            series: [{
+                name: '车辆类型',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                itemStyle: {
+                    borderRadius: 10,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: '20',
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: [
+                    { value: 250, name: '业主车辆', itemStyle: { color: '#1890ff' } },
+                    { value: 86, name: '访客车辆', itemStyle: { color: '#722ed1' } },
+                    { value: 50, name: '临时车辆', itemStyle: { color: '#faad14' } }
+                ]
+            }]
+        });
+
+        // 响应窗口大小变化
+        window.addEventListener('resize', function() {
+            parkingUsageChart.resize();
+            carTypeChart.resize();
+        });
+    </script>
+</body>
+</html>

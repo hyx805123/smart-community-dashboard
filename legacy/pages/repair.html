@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>报修管理 - 智慧社区监控大屏</title>
+    <link rel="stylesheet" href="../assets/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/common.css">
+    <script src="../assets/js/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(-45deg, #1a1a1a, #2d2d2d, #1a1a1a, #2d2d2d);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+
+
+        .nav-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            color: #1890ff;
+        }
+
+        .nav-item:hover {
+            background-color: #3d3d3d;
+        }
+
+        .nav-item.active {
+            background-color: #4a4a4a;
+            border-left: 4px solid #1890ff;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 200px;
+            padding: 20px;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .repair-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .repair-card {
+            background: rgba(45, 45, 45, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .repair-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .repair-chart {
+            height: 300px;
+            margin-top: 20px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .repair-list {
+            margin-top: 30px;
+        }
+
+        .repair-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .repair-table th,
+        .repair-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .repair-table th {
+            background: rgba(0, 0, 0, 0.2);
+            font-weight: normal;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .tag-pending {
+            background-color: rgba(250, 173, 20, 0.2);
+            color: #faad14;
+        }
+
+        .tag-processing {
+            background-color: rgba(24, 144, 255, 0.2);
+            color: #1890ff;
+        }
+
+        .tag-completed {
+            background-color: rgba(82, 196, 26, 0.2);
+            color: #52c41a;
+        }
+
+        .priority-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .priority-high {
+            background-color: #ff4d4f;
+        }
+
+        .priority-medium {
+            background-color: #faad14;
+        }
+
+        .priority-low {
+            background-color: #52c41a;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="../assets/logo.svg" alt="智慧社区">
+            <h2>智慧社区</h2>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="../index.html"><i class="fas fa-chart-line"></i><span>社区概况</span></a></li>
+            <li class="nav-item"><a href="monitor.html"><i class="fas fa-video"></i><span>实时监控</span></a></li>
+            <li class="nav-item"><a href="device.html"><i class="fas fa-tools"></i><span>设备管理</span></a></li>
+            <li class="nav-item"><a href="alarm.html"><i class="fas fa-bell"></i><span>告警管理</span></a></li>
+            <li class="nav-item"><a href="people.html"><i class="fas fa-users"></i><span>人员信息</span></a></li>
+            <li class="nav-item"><a href="house.html"><i class="fas fa-home"></i><span>房屋信息</span></a></li>
+            <li class="nav-item"><a href="car.html"><i class="fas fa-car"></i><span>车辆信息</span></a></li>
+            <li class="nav-item"><a href="patrol.html"><i class="fas fa-shield-alt"></i><span>巡更管理</span></a></li>
+            <li class="nav-item active"><a href="repair.html"><i class="fas fa-wrench"></i><span>报修管理</span></a></li>
+            <li class="nav-item"><a href="notice.html"><i class="fas fa-bullhorn"></i><span>公告信息</span></a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>报修管理</h1>
+        </div>
+
+        <div class="repair-grid">
+            <div class="repair-card">
+                <h3>报修概况</h3>
+                <div class="repair-info">
+                    <div>
+                        <h4>总报修</h4>
+                        <p style="font-size: 24px;">156</p>
+                    </div>
+                    <div>
+                        <h4>待处理</h4>
+                        <p style="font-size: 24px; color: #faad14;">45</p>
+                    </div>
+                    <div>
+                        <h4>处理中</h4>
+                        <p style="font-size: 24px; color: #1890ff;">68</p>
+                    </div>
+                    <div>
+                        <h4>已完成</h4>
+                        <p style="font-size: 24px; color: #52c41a;">43</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="repair-card">
+                <h3>报修类型分布</h3>
+                <div id="repairTypeChart" class="repair-chart"></div>
+            </div>
+
+            <div class="repair-card">
+                <h3>处理时效分析</h3>
+                <div id="repairEfficiencyChart" class="repair-chart"></div>
+            </div>
+        </div>
+
+        <div class="repair-list repair-card">
+            <h3>报修记录</h3>
+            <table class="repair-table">
+                <thead>
+                    <tr>
+                        <th>报修编号</th>
+                        <th>报修类型</th>
+                        <th>报修位置</th>
+                        <th>优先级</th>
+                        <th>报修时间</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>RP202401200001</td>
+                        <td>水电维修</td>
+                        <td>A栋1单元1201</td>
+                        <td>
+                            <div style="display: flex; align-items: center;">
+                                <div class="priority-dot priority-high"></div>
+                                高
+                            </div>
+                        </td>
+                        <td>2024-01-20 10:30</td>
+                        <td><span class="tag tag-pending">待处理</span></td>
+                    </tr>
+                    <tr>
+                        <td>RP202401200002</td>
+                        <td>门窗维修</td>
+                        <td>B栋2单元1502</td>
+                        <td>
+                            <div style="display: flex; align-items: center;">
+                                <div class="priority-dot priority-medium"></div>
+                                中
+                            </div>
+                        </td>
+                        <td>2024-01-20 09:45</td>
+                        <td><span class="tag tag-processing">处理中</span></td>
+                    </tr>
+                    <tr>
+                        <td>RP202401200003</td>
+                        <td>公共设施</td>
+                        <td>C区健身广场</td>
+                        <td>
+                            <div style="display: flex; align-items: center;">
+                                <div class="priority-dot priority-low"></div>
+                                低
+                            </div>
+                        </td>
+                        <td>2024-01-20 09:15</td>
+                        <td><span class="tag tag-completed">已完成</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 初始化图表
+        const repairTypeChart = echarts.init(document.getElementById('repairTypeChart'));
+        const repairEfficiencyChart = echarts.init(document.getElementById('repairEfficiencyChart'));
+
+        // 报修类型分布配置
+        const typeOption = {
+            title: {
+                text: '报修类型分布',
+                textStyle: {
+                    color: '#fff'
+                }
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{b}: {c} ({d}%)'
+            },
+            series: [{
+                type: 'pie',
+                radius: '70%',
+                data: [
+                    { value: 35, name: '水电维修' },
+                    { value: 25, name: '门窗维修' },
+                    { value: 20, name: '公共设施' },
+                    { value: 15, name: '电梯故障' },
+                    { value: 5, name: '其他' }
+                ],
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                },
+                label: {
+                    color: '#fff'
+                }
+            }]
+        };
+
+        // 处理时效分析配置
+        const efficiencyOption = {
+            title: {
+                text: '处理时效分析',
+                textStyle: {
+                    color: '#fff'
+                }
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            xAxis: {
+                type: 'category',
+                data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                axisLine: {
+                    lineStyle: {
+                        color: '#fff'
+                    }
+                }
+            },
+            yAxis: {
+                type: 'value',
+                name: '平均处理时间(小时)',
+                axisLine: {
+                    lineStyle: {
+                        color: '#fff'
+                    }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            },
+            series: [{
+                data: [4.5, 3.8, 5.2, 4.0, 3.5, 6.0, 5.5],
+                type: 'line',
+                smooth: true,
+                lineStyle: {
+                    color: '#1890ff'
+                },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0,
+                        color: 'rgba(24, 144, 255, 0.3)'
+                    }, {
+                        offset: 1,
+                        color: 'rgba(24, 144, 255, 0)'
+                    }])
+                }
+            }]
+        };
+
+        // 设置图表配置
+        repairTypeChart.setOption(typeOption);
+        repairEfficiencyChart.setOption(efficiencyOption);
+
+        // 响应窗口大小变化
+        window.addEventListener('resize', () => {
+            repairTypeChart.resize();
+            repairEfficiencyChart.resize();
+        });
+    </script>
+</body>
+</html>
