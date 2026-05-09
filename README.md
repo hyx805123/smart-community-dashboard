@@ -92,3 +92,9 @@ src/
 ## 原项目
 
 原纯 HTML 项目完整备份在 `legacy/` 目录中。
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+Copyright (c) 2026 350168448@qq.com. All rights reserved.
